@@ -23,7 +23,7 @@ threading.Thread(target=run_server, daemon=True).start()
 # --- 2. Настройки ---
 TOKEN = os.environ.get("BOT_TOKEN")
 ADMIN_ID = os.environ.get("ADMIN_ID")  # ВАШ ЛИЧНЫЙ ID (узнать у @userinfobot)
-CONTACT_USERNAME = "@Moscow1488" # ИСПРАВЛЕНО: убрано подчеркивание, как у вас в профиле
+CONTACT_USERNAME = "@Moscow_1488" # ИСПРАВЛЕНО: добавлено нижнее подчеркивание
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -114,7 +114,7 @@ def receive_username(message, stars, price):
     conn.commit()
     conn.close()
 
-    # 1. Сообщение ПОКУПАТЕЛЮ (без Markdown, чтобы ничего не ломалось)
+    # 1. Сообщение ПОКУПАТЕЛЮ
     buyer_text = (
         f"✅ Заказ №{order_id} создан!\n\n"
         f"🌟 Количество звёзд: {stars}\n"
@@ -148,7 +148,7 @@ def receive_username(message, stars, price):
 
 @bot.message_handler(func=lambda message: message.text == "ℹ️ О магазине")
 def about_shop(message):
-    # Убран parse_mode, чтобы кнопка гарантированно работала
+    # Без Markdown, чтобы кнопка гарантированно работала
     text = (
         "🏪 О нашем магазине\n\n"
         "Мы занимаемся продажей звёзд Telegram с 2023 года.\n"
