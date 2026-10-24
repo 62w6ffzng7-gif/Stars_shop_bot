@@ -23,7 +23,7 @@ threading.Thread(target=run_server, daemon=True).start()
 # --- 2. Настройки ---
 TOKEN = os.environ.get("BOT_TOKEN")
 ADMIN_ID = os.environ.get("ADMIN_ID")  # ВАШ ЛИЧНЫЙ ID (узнать у @userinfobot)
-CONTACT_USERNAME = "@Moscow_1488" # Ваш юзернейм для связи
+CONTACT_USERNAME = "@Moscow1488" # ИСПРАВЛЕНО: убрано подчеркивание, как у вас в профиле
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -78,10 +78,10 @@ def buy_menu(message):
     text = (
         "💎 Выберите пакет звёзд:\n\n"
         "🔹 13 звёзд — 25 рублей\n\n"
-        "⚠️ *Пакеты на 21 и 43 звезды временно недоступны.*\n\n"
+        "⚠️ Пакеты на 21 и 43 звезды временно недоступны.\n\n"
         "Нажмите на нужный пакет ниже:"
     )
-    bot.send_message(message.chat.id, text, parse_mode='Markdown', reply_markup=stars_keyboard())
+    bot.send_message(message.chat.id, text, reply_markup=stars_keyboard())
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("buy_"))
 def process_buy(call):
@@ -114,58 +114,59 @@ def receive_username(message, stars, price):
     conn.commit()
     conn.close()
 
-    # 1. Сообщение ПОКУПАТЕЛЮ
+    # 1. Сообщение ПОКУПАТЕЛЮ (без Markdown, чтобы ничего не ломалось)
     buyer_text = (
-        f"✅ **Заказ №{order_id} создан!**\n\n"
+        f"✅ Заказ №{order_id} создан!\n\n"
         f"🌟 Количество звёзд: {stars}\n"
         f"💰 Сумма к оплате: {price} ₽\n"
         f"👤 Получатель: {username}\n\n"
-        f"🔑 **Ваш секретный код:** `{secret}`\n\n"
-        f"💳 **Что делать дальше:**\n"
+        f"🔑 Ваш секретный код: {secret}\n\n"
+        f"💳 Что делать дальше:\n"
         f"1. Напишите нашему менеджеру: {CONTACT_USERNAME}\n"
-        f"2. В сообщении укажите **номер заказа ({order_id})** и **секретный код (`{secret}`)**.\n"
+        f"2. В сообщении укажите номер заказа ({order_id}) и секретный код ({secret}).\n"
         f"3. Менеджер пришлет вам реквизиты для оплаты (карта/СБП).\n\n"
         f"После оплаты звёзды будут зачислены в течение 5 минут! ⏱️"
     )
-    bot.send_message(message.chat.id, buyer_text, parse_mode='Markdown', reply_markup=main_menu())
+    bot.send_message(message.chat.id, buyer_text, reply_markup=main_menu())
 
     # 2. Уведомление АДМИНУ (Вам)
     if ADMIN_ID:
         admin_text = (
-            f"🚨 **НОВЫЙ ЗАКАЗ!**\n\n"
+            f"🚨 НОВЫЙ ЗАКАЗ!\n\n"
             f"🆔 Номер заказа: {order_id}\n"
             f"👤 Покупатель: {message.from_user.first_name} (@{message.from_user.username})\n"
             f"🎯 Получатель звёзд: {username}\n"
             f"🌟 Количество: {stars} шт.\n"
             f"💰 Сумма: {price} ₽\n\n"
-            f"🔑 **Секретный код:** `{secret}`\n\n"
-            f"⚠️ *Ожидайте сообщения от покупателя для выставления реквизитов.*"
+            f"🔑 Секретный код: {secret}\n\n"
+            f"⚠️ Ожидайте сообщения от покупателя для выставления реквизитов."
         )
         try:
-            bot.send_message(int(ADMIN_ID), admin_text, parse_mode='Markdown')
+            bot.send_message(int(ADMIN_ID), admin_text)
         except Exception as e:
             print(f"Ошибка отправки админу: {e}")
 
 @bot.message_handler(func=lambda message: message.text == "ℹ️ О магазине")
 def about_shop(message):
+    # Убран parse_mode, чтобы кнопка гарантированно работала
     text = (
-        "🏪 **О нашем магазине**\n\n"
+        "🏪 О нашем магазине\n\n"
         "Мы занимаемся продажей звёзд Telegram с 2023 года.\n"
         "✅ Работаем быстро и надёжно.\n"
         "✅ Цены ниже официальных.\n"
         "✅ Поддержка 24/7.\n\n"
         f"По всем вопросам: {CONTACT_USERNAME}"
     )
-    bot.send_message(message.chat.id, text, parse_mode='Markdown', reply_markup=main_menu())
+    bot.send_message(message.chat.id, text, reply_markup=main_menu())
 
 @bot.message_handler(func=lambda message: message.text == "📞 Связаться с продавцом")
 def contact_seller(message):
     text = (
-        "📞 **Связь с продавцом**\n\n"
+        "📞 Связь с продавцом\n\n"
         f"Напишите нам в Telegram: {CONTACT_USERNAME}\n\n"
         "Мы всегда рады помочь! 😊"
     )
-    bot.send_message(message.chat.id, text, parse_mode='Markdown', reply_markup=main_menu())
+    bot.send_message(message.chat.id, text, reply_markup=main_menu())
 
 # --- 7. Запуск ---
 if __name__ == '__main__':
